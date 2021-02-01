@@ -3,7 +3,7 @@ RESTORE='\033[0m'
 RED='\033[00;31m'
 GREEN='\033[00;32m'
 YELLOW='\e[0;33m'
-HOST_PROD={{name}}.example.com
+HOST_PROD=BusStats.example.com
 
 # Because nobody wants to be memorizing commands all the time
 # Instructions:
@@ -12,7 +12,7 @@ HOST_PROD={{name}}.example.com
 # 3) Be happy
 
 
-workon {{name}}
+workon BusStats
 
 export PROJ_BASE="$(dirname "${BASH_SOURCE[0]}")"
 CD=$(pwd)
@@ -82,7 +82,7 @@ function djangorun {
 function dkbuild {
     CD=$(pwd)
     cd $PROJ_BASE
-    docker build -t {{name}} .
+    docker build -t BusStats .
     exitcode=$?
     cd $CD
     return $exitcode
@@ -91,7 +91,7 @@ function dkbuild {
 function dknpminstall {
     CD=$(pwd)
     cd $PROJ_BASE
-    docker run -it --rm -v $(pwd):/app -w /app/frontend -e NODE_ENV=development {{name}} npm install
+    docker run -it --rm -v $(pwd):/app -w /app/frontend -e NODE_ENV=development BusStats npm install
     exitcode=$?
     cd $CD
     return $exitcode
@@ -116,18 +116,18 @@ function dkup {
 }
 
 function dkrun_prod {
-    docker stop {{name}}
-    docker rm {{name}}
-    docker run --name {{name}} -d --env-file /home/ubuntu/{{name}}.env \
+    docker stop BusStats
+    docker rm BusStats
+    docker run --name BusStats -d --env-file /home/ubuntu/BusStats.env \
         -p 3000:3000 -p 8000:8000 \
-        -v /home/ubuntu/dkdata/{{name}}:/dkdata \
-        {{name}} start_web.sh
+        -v /home/ubuntu/dkdata/BusStats:/dkdata \
+        BusStats start_web.sh
 }
 
 function deploy_prod {
-  rsync -av --exclude frontend/node_modules --exclude frontend/.nuxt * ubuntu@$HOST_PROD:./{{name}}/
+  rsync -av --exclude frontend/node_modules --exclude frontend/.nuxt * ubuntu@$HOST_PROD:./BusStats/
   ssh ubuntu@$HOST_PROD "
-    cd ~/{{name}}
+    cd ~/BusStats
     source dev.sh
     dkbuild
     dkrun_prod
@@ -135,7 +135,7 @@ function deploy_prod {
 }
 
 function dk {
-    docker exec -it {{name}} $@
+    docker exec -it BusStats $@
 }
 
 function runflake8 {
@@ -159,7 +159,7 @@ function echo_yellow {
     echo -e "${YELLOW}$1${RESTORE}";
 }
 
-echo_green "Welcome to {{name}}'s dev env"
+echo_green "Welcome to BusStats's dev env"
 echo_green "Hint: autocomplete works for the commands below ;)"
 echo_red   "------------------------------------------------------------------------"
 devhelp

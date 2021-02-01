@@ -1,6 +1,6 @@
 version: '3'
 services:
-  {{name}}:
+  BusStats:
     image: ${TEST_IMAGE}
     depends_on:
       - db

@@ -10,8 +10,8 @@ services:
     volumes:
       - ../dkdata/postgres:/var/lib/postgresql/data
   web:
-    image: {{name}}
-    container_name: {{name}}
+    image: BusStats
+    container_name: BusStats
     build: .
     command: start_web.sh
     environment:

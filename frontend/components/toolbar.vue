@@ -3,11 +3,11 @@
     <v-app-bar-nav-icon @click="state.drawer = !state.drawer" />
     <v-toolbar-title>
       <a href="/" class="barra2">
-        BusCheck
+        BusStats
       </a>
     </v-toolbar-title>
     <v-spacer />
-    <v-btn v-if="!logged_user" text dark ripple class="ma-0 ml-5" @click="open_login_dialog($event)">Login</v-btn>
+    <!-- <v-btn v-if="!logged_user" text dark ripple class="ma-0 ml-5" @click="open_login_dialog($event)">Login</v-btn> -->
 
     <!-- <template v-slot:activator="{ on }"><v-btn v-on="on">
     <v-menu v-if="logged_user" offset-y>

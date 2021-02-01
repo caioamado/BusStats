@@ -20,7 +20,7 @@ dkup  # Brings up everything
 With `dkup` running, open another terminal
 
 ```bash
-dk bash  # starts bash inside "{{name}}" container
+dk bash  # starts bash inside "BusStats" container
 ./manage.py migrate  # create database tables and stuff
 ./manage.py createsuperuser  # creates an application user in the database
 ```
@@ -29,10 +29,10 @@ What is happenning:
 
 * `dev.sh` is a collection of useful bash functions for this project's development environment. You're encouraged to look inside and see how that works, and add more as the project progresses.
 * `dknpminstall` will start a docker container and run `npm install` inside to download node dependencies to the `frontend/node_modules` folder. Using docker for this means you don't need to worry about installing (and choosing version for) node/npm.
-* `dkup` uses docker-compose to start 3 containers: postgres, nginx, and {{name}}.
+* `dkup` uses docker-compose to start 3 containers: postgres, nginx, and BusStats.
 * The dockerized postgres saves its state into `docker/dkdata`. You can delete that if you want your dev database to go kaboom.
-* Once `dkup` is running, `dk <command>` will run `<command>` inside the `{{name}}` container. So `dk bash` will get you "logged in" as root inside that container. Once inside, you need to run Django's `manage.py` commands to initialize the database properly.
-* The {{name}} container runs 3 services:
+* Once `dkup` is running, `dk <command>` will run `<command>` inside the `BusStats` container. So `dk bash` will get you "logged in" as root inside that container. Once inside, you need to run Django's `manage.py` commands to initialize the database properly.
+* The BusStats container runs 3 services:
  * django on port 8000
  * nuxt frontend with real APIs on port 3000
  * nuxt frontend with mock APIs on port 3001
@@ -59,7 +59,7 @@ dkpgnginx  # Starts postgres and nginx inside docker
 With `dkpgnginx` running, start another terminal:
 
 ```bash
-mkvirtualenv {{name}} -p python3  # creates a python3 virtualenv
+mkvirtualenv BusStats -p python3  # creates a python3 virtualenv
 pip install -r requirements.txt  # install python dependencies inside virtualenv
 export DJANGO_DB_PORT=5432  # That's where our dockerized postgres is listening
 ./manage.py runserver  # starts django on port 8000
@@ -95,15 +95,15 @@ Since nginx is also running you go ahead and point your browser to http://localh
 # 3. Deploy to production
 
 Rent a linux machine on a cloud somewhere. Let's say you'll be using ubuntu on AWS.
-Install docker and nginx. Create an empty postgres database {{name}} owned by a user {{name}}.
+Install docker and nginx. Create an empty postgres database BusStats owned by a user BusStats.
 
-On your remote machine, create a file ~/{{name}}.env:
+On your remote machine, create a file ~/BusStats.env:
 
 ```
-DJANGO_DB_PASSWORD=<{{name}}'s password>
+DJANGO_DB_PASSWORD=<BusStats's password>
 DJANGO_DB_HOST=<database_ip>
-DJANGO_DB_NAME={{name}}
-DJANGO_DB_USER={{name}}
+DJANGO_DB_NAME=BusStats
+DJANGO_DB_USER=BusStats
 DJANGO_DEBUG=0
 ```
 
@@ -111,7 +111,7 @@ Have a nginx config serving your domain like:
 
 ```
 server {
-    server_name  {{name}}.example.com;
+    server_name  BusStats.example.com;
 
     location /api {
         proxy_pass http://localhost:8000/api;
@@ -120,7 +120,7 @@ server {
         proxy_pass http://localhost:8000/admin;
     }
     location /static {
-        alias /home/ubuntu/dkdata/{{name}}/static;
+        alias /home/ubuntu/dkdata/BusStats/static;
         add_header Cache-Control public;
         add_header ETag "";
     }
@@ -132,7 +132,7 @@ server {
 }
 ```
 
-(Replace "{{name}}.example.com" with your production domain)
+(Replace "BusStats.example.com" with your production domain)
 
 On your development environment, edit the `HOST_PROD` variable on `dev.sh` to make it point to your production domain, then run on terminal:
 

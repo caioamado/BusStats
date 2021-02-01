@@ -5,5 +5,5 @@ dkdata
 coverage.xml
 htmlcov/
 .idea
-/{{name}}.log
+/BusStats.log
 .vscode

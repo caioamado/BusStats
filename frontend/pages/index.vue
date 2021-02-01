@@ -53,7 +53,7 @@ export default {
     }
   },
   asyncData(){
-    AppApi.buscrawl(origem, destino, dia).then(response =>
+    AppApi.buscrawl('sao-jose-dos-campos-sp', 'rio-de-janeiro-rj-todos', '2021-02-05').then(response =>
       console.log(response)
     )
   }
