@@ -60,7 +60,7 @@ export default {
 
 <style>
 .background {
-  background-image: url("https://cdn.discordapp.com/attachments/486723864517148672/805565332797653002/blue-wallpaper-background-texture-checkbox.jpg");
+  background-image: url("../static/1614778.jpg");
   background-size: cover;
 }
 .contmapa {

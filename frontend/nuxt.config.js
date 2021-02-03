@@ -111,7 +111,11 @@ export default {
     /*
     ** You can extend webpack config here
     */
-    extend (config, ctx) {
+    devtools: true,
+    extend (config, { isClient }) {
+      if (isClient) {
+        config.devtool = 'source-map'
+      }
       const home = config.resolve.alias['~']
       config.resolve.alias['~api'] = home + '/helpers/' + _apijs
     }
