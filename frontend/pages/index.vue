@@ -37,7 +37,7 @@
             Teste
           </v-btn>
           <section v-if="viagens[14]" style="width: 100%">
-            <div>Rota  {{showorigem}}   =>   {{showdestino}}</div>
+            <div class="titulozao">Rota  {{showorigem}}   =>   {{showdestino}}</div>
             <div class="titles">Proporção de classes de viagem</div>
             <pie-chart :data="[['Convencional', Object.keys(Convgraph.data).length], ['Executivo', Object.keys(Execgraph.data).length], ['SemiLeito', Object.keys(Slgraph.data).length], ['Leito', Object.keys(Lgraph.data).length]]" />
             <div class="titles">Quantidade de viagens dos próximos 15 dias</div>
@@ -93,9 +93,6 @@ export default {
     for (let i = 1; i <= 15; i++) {
       this.datas[i - 1] = this.add_dias(i)
     }
-    // for(var d=0; d<15; d++)
-    // AppApi.buscrawl(this.origem, this.destino, this.datas[1]).then(response =>
-    // this.viagens=response)
   },
   methods: {
     average: (array) => array.reduce((a, b) => a + b) / array.length,
@@ -135,25 +132,15 @@ export default {
           }
         }
         this.dias.push([this.datas[a], Object.keys(this.viagens[a]).length])
-        // this.Avgconv.data[this.datas[a]] = this.average(this.convaux[a])
-        // this.Avgexec.data[this.datas[a]] = this.average(this.execaux[a])
-        // this.Avgsl.data[this.datas[a]] = this.average(this.slaux[a])
-        // this.Avgl.data[this.datas[a]] = this.average(this.leitoaux[a])
+        this.Avgconv.data[this.datas[a]] = this.average(this.convaux[a])
+        this.Avgexec.data[this.datas[a]] = this.average(this.execaux[a])
+        this.Avgsl.data[this.datas[a]] = this.average(this.slaux[a])
+        this.Avgl.data[this.datas[a]] = this.average(this.leitoaux[a])
       }
       this.showorigem = this.origem
       this.showdestino = this.destino
       this.origem = ''
       this.destino = ''
-    },
-    teste () {
-      window.console.log('Avgconv')
-      window.console.log(this.Avgconv)
-      window.console.log('Convgraph')
-      window.console.log(this.Convgraph.data)
-      window.console.log(Object.keys(this.Convgraph.data).length)
-      window.console.log('Execgraph')
-      window.console.log(this.Execgraph.data)
-      window.console.log(Object.keys(this.Execgraph.data).length)
     }
   }
 }
@@ -195,6 +182,12 @@ img {
   margin-bottom: 8px;
   font-weight: bold;
   font-size: 20px;
+}
+
+.titulozao {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 35px;
 }
 
 div {
