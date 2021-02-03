@@ -37,12 +37,21 @@
             Teste
           </v-btn>
           <section v-if="viagens[14]" style="width: 100%">
-            <div>Proporção de classes de viagem</div>
-            <pie-chart :data="[['Convencional', preco_classe.Convencional.length], ['Executivo', preco_classe.Executivo.length], ['SemiLeito', preco_classe.SemiLeito.length], ['Leito', preco_classe.Leito.length]]" />
-            <div>Quantidade de viagens dos próximos 15 dias</div>
+            <div>Rota  {{showorigem}}   =>   {{showdestino}}</div>
+            <div class="titles">Proporção de classes de viagem</div>
+            <pie-chart :data="[['Convencional', Object.keys(Convgraph.data).length], ['Executivo', Object.keys(Execgraph.data).length], ['SemiLeito', Object.keys(Slgraph.data).length], ['Leito', Object.keys(Lgraph.data).length]]" />
+            <div class="titles">Quantidade de viagens dos próximos 15 dias</div>
             <column-chart :data="dias" />
-            <div>Preços da classe Convencional</div>
-            <line-chart :data="preco_classe.Convencional" />
+            <div class="titles">Preços da classe Convencional</div>
+            <line-chart :data="[Convgraph]" />
+            <div class="titles">Preços da classe Executivo</div>
+            <line-chart :data="[Execgraph]" />
+            <div class="titles">Preços da classe Semi Leito</div>
+            <line-chart :data="[Slgraph]" />
+            <div class="titles">Preços da classe Leito</div>
+            <line-chart :data="[Lgraph]" />
+            <div class="titles">Preços da classe Leito</div>
+            <line-chart :data="[Avgconv, Avgexec, Avgsl, Avgl]" />
           </section>
         </v-container>
       </v-form>
@@ -62,9 +71,22 @@ export default {
       viagens: {},
       // {'daquia1':{}, 'daquia2':{}, 'daquia3':{}, 'daquia4':{}, 'daquia5':{}, 'daquia6':{}, 'daquia7':{}, 'daquia8':{}, 'daquia9':{}, 'daquia10':{}, 'daquia11':{}, 'daquia12':{}, 'daquia13':{}, 'daquia14':{}, 'daquia15':{}},
       datas: [],
-      preco_classe: {'Convencional': [], 'Executivo': [], 'SemiLeito': [], 'Leito': []},
       loading: false,
-      dias: []
+      dias: [],
+      showorigem: '',
+      showdestino: '',
+      Convgraph: {name: 'Convencional', data: {}},
+      Execgraph: {name: 'Executivo', data: {}},
+      Slgraph: {name: 'SemiLeito', data: {}},
+      Lgraph: {name: 'Leito', data: {}},
+      Avgconv: {name: 'Convencional', data: {}},
+      convaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
+      Avgexec: {name: 'Executivo', data: {}},
+      execaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
+      Avgsl: {name: 'SemiLeito', data: {}},
+      slaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
+      Avgl: {name: 'Leito', data: {}},
+      leitoaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
     }
   },
   created () {
@@ -76,6 +98,7 @@ export default {
     // this.viagens=response)
   },
   methods: {
+    average: (array) => array.reduce((a, b) => a + b) / array.length,
     add_dias (days) {
       const result = new Date()
       result.setDate(result.getDate() + days)
@@ -84,35 +107,53 @@ export default {
     async faz_tudo () {
       this.loading = true
       for (let d = 0; d < 15; d++) {
-        // AppApi.buscrawl(this.origem, this.destino, this.datas[d]).then(response =>
-        // this.viagens.push(d = response)
-        // )
         const promise = AppApi.buscrawl(this.origem, this.destino, this.datas[d]).then(response =>
           response)
         const result = await promise
         this.viagens[d] = result
       }
       this.loading = false
+      // for pra cada 1 dos 15 dias analisados
       for (let a = 0; a < 15; a++) {
+        // for pra cada viagem do dia
         for (let b = 0; b < Object.keys(this.viagens[a]).length; b++) {
+          const data_aux = (new Date(this.datas[a] + ' ' + this.viagens[a][b].horario)).toLocaleDateString()
+          const hora_aux = (new Date(this.datas[a] + ' ' + this.viagens[a][b].horario)).toLocaleTimeString()
           if (this.viagens[a][b].classe === 'Convencional') {
-            this.preco_classe.Convencional.push(this.datas[a], this.viagens[a][b].preco)
+            // adiciona no array de preço da respectiva classe
+            this.Convgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
+            this.convaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
           } else if (this.viagens[a][b].classe === 'Executivo') {
-            this.preco_classe.Executivo.push(this.datas[a], this.viagens[a][b].preco)
+            this.Execgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
+            this.execaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
           } else if (this.viagens[a][b].classe === ('Semi-Leito' || 'SEMI LEITO')) {
-            this.preco_classe.SemiLeito.push(this.datas[a], this.viagens[a][b].preco)
+            this.Slgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
+            this.slaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
           } else if (this.viagens[a][b].classe === 'Leito') {
-            this.preco_classe.Leito.push(this.datas[a], this.viagens[a][b].preco)
+            this.Lgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
+            this.leitoaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
           }
         }
         this.dias.push([this.datas[a], Object.keys(this.viagens[a]).length])
+        // this.Avgconv.data[this.datas[a]] = this.average(this.convaux[a])
+        // this.Avgexec.data[this.datas[a]] = this.average(this.execaux[a])
+        // this.Avgsl.data[this.datas[a]] = this.average(this.slaux[a])
+        // this.Avgl.data[this.datas[a]] = this.average(this.leitoaux[a])
       }
+      this.showorigem = this.origem
+      this.showdestino = this.destino
       this.origem = ''
       this.destino = ''
     },
     teste () {
-      window.console.log(this.dias)
-      window.console.log(this.preco_classe)
+      window.console.log('Avgconv')
+      window.console.log(this.Avgconv)
+      window.console.log('Convgraph')
+      window.console.log(this.Convgraph.data)
+      window.console.log(Object.keys(this.Convgraph.data).length)
+      window.console.log('Execgraph')
+      window.console.log(this.Execgraph.data)
+      window.console.log(Object.keys(this.Execgraph.data).length)
     }
   }
 }
@@ -122,7 +163,7 @@ export default {
 
 .input_box {
   width: 500px;
-  background-color: rgb(0, 5, 73);
+  background-color: rgba(0, 1, 58, 0.897);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -147,6 +188,16 @@ img {
   width: 90px;
   height: 90px;
   object-fit: cover;
-;
+}
+
+.titles {
+  margin-top: 15px;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+div {
+  text-align: center;
 }
 </style>
