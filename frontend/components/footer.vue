@@ -1,6 +1,6 @@
 <template>
   <v-footer color="blue-grey" class="white--text" height="28px" app>
-    <span class="rodape">Powered by: Chartkick, BeautifulSoup</span>
+    <span class="rodape">Powered by: Chartkick & BeautifulSoup</span>
     <v-spacer />
     <span class="rodape">2021</span>
   </v-footer>
