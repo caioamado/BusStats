@@ -98,21 +98,7 @@ export default {
       return result.toISOString().slice(0, 10)
     },
     async faz_tudo () {
-      this.viagens = {}
-      this.showorigem = ''
-      this.showdestino = ''
-      this.Convgraph = {name: 'Convencional', data: {}}
-      this.Execgraph = {name: 'Executivo', data: {}}
-      this.Slgraph = {name: 'Semi-Leito', data: {}}
-      this.Lgraph = {name: 'Leito', data: {}}
-      this.Avgconv = {name: 'Convencional', data: {}}
-      this.convaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
-      this.Avgexec = {name: 'Executivo', data: {}}
-      this.execaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
-      this.Avgsl = {name: 'SemiLeito', data: {}}
-      this.slaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
-      this.Avgl = {name: 'Leito', data: {}}
-      this.leitoaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+      this.reset_all()
       this.loading = true
       for (let d = 0; d < 15; d++) {
         const promise = AppApi.buscrawl(this.origem, this.destino, this.datas[d]).then(response =>
@@ -134,6 +120,7 @@ export default {
           } else if (this.viagens[a][b].classe.match(this.r_exec)) {
             this.Execgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             this.execaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
+            // ordem semi => leito proposital para semi-leito cair no semi e não no leito
           } else if (this.viagens[a][b].classe.match(this.r_semi)) {
             this.Slgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             this.slaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
@@ -152,6 +139,23 @@ export default {
       this.showdestino = this.destino
       this.origem = ''
       this.destino = ''
+    },
+    reset_all () {
+      this.viagens = {}
+      this.showorigem = ''
+      this.showdestino = ''
+      this.Convgraph = {name: 'Convencional', data: {}}
+      this.Execgraph = {name: 'Executivo', data: {}}
+      this.Slgraph = {name: 'Semi-Leito', data: {}}
+      this.Lgraph = {name: 'Leito', data: {}}
+      this.Avgconv = {name: 'Convencional', data: {}}
+      this.convaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+      this.Avgexec = {name: 'Executivo', data: {}}
+      this.execaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+      this.Avgsl = {name: 'SemiLeito', data: {}}
+      this.slaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+      this.Avgl = {name: 'Leito', data: {}}
+      this.leitoaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
     }
   }
 }
