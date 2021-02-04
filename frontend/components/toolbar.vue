@@ -1,6 +1,6 @@
 <template>
   <v-app-bar fixed app clipped-right>
-    <v-app-bar-nav-icon @click="state.drawer = !state.drawer" />
+    <!-- <v-app-bar-nav-icon @click="state.drawer = !state.drawer" /> -->
     <v-toolbar-title>
       <a href="/" class="barra2">
         BusStats

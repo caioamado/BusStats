@@ -2,7 +2,7 @@
   <v-app id="inspire">
     <toolbar :state="layout" class="barra" /><link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
-    <sidenav-left :state="layout" class="side-bar" />
+    <!-- <sidenav-left :state="layout" class="side-bar" /> -->
     <v-content class="background">
       <v-container fluid>
         <nuxt />
@@ -29,7 +29,7 @@ import Vue from 'vue'
 import Chartkick from 'vue-chartkick'
 import Chart from 'chart.js'
 import toolbar from '~/components/toolbar.vue'
-import sidenavLeft from '~/components/sidenav-left.vue'
+// import sidenavLeft from '~/components/sidenav-left.vue'
 import footer from '~/components/footer.vue'
 
 Vue.use(Chartkick.use(Chart))
@@ -37,7 +37,7 @@ Vue.use(Chartkick.use(Chart))
 export default {
   components: {
     toolbar,
-    sidenavLeft,
+    // sidenavLeft,
     leFooter: footer
   },
   data: () => ({

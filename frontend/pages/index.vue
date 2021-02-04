@@ -29,13 +29,6 @@
           >
             Analisar rota
           </v-btn>
-          <v-btn
-            depressed
-            elevation="2"
-            rounded @click="teste()"
-          >
-            Teste
-          </v-btn>
           <section v-if="viagens[14]" style="width: 100%">
             <div class="titulozao">Rota  {{showorigem}}   =>   {{showdestino}}</div>
             <div class="titles">Proporção de classes de viagem</div>
@@ -50,7 +43,7 @@
             <line-chart :data="[Slgraph]" />
             <div class="titles">Preços da classe Leito</div>
             <line-chart :data="[Lgraph]" />
-            <div class="titles">Preços da classe Leito</div>
+            <div class="titles">Média de preços por classe</div>
             <line-chart :data="[Avgconv, Avgexec, Avgsl, Avgl]" />
           </section>
         </v-container>
@@ -69,7 +62,6 @@ export default {
       origem: '',
       destino: '',
       viagens: {},
-      // {'daquia1':{}, 'daquia2':{}, 'daquia3':{}, 'daquia4':{}, 'daquia5':{}, 'daquia6':{}, 'daquia7':{}, 'daquia8':{}, 'daquia9':{}, 'daquia10':{}, 'daquia11':{}, 'daquia12':{}, 'daquia13':{}, 'daquia14':{}, 'daquia15':{}},
       datas: [],
       loading: false,
       dias: [],
@@ -86,7 +78,11 @@ export default {
       Avgsl: {name: 'SemiLeito', data: {}},
       slaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
       Avgl: {name: 'Leito', data: {}},
-      leitoaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+      leitoaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
+      r_conv: /Convencional/i,
+      r_exec: /Executivo/i,
+      r_semi: /Semi/i,
+      r_leito: /Leito/i
     }
   },
   created () {
@@ -102,6 +98,21 @@ export default {
       return result.toISOString().slice(0, 10)
     },
     async faz_tudo () {
+      this.viagens = {}
+      this.showorigem = ''
+      this.showdestino = ''
+      this.Convgraph = {name: 'Convencional', data: {}}
+      this.Execgraph = {name: 'Executivo', data: {}}
+      this.Slgraph = {name: 'Semi-Leito', data: {}}
+      this.Lgraph = {name: 'Leito', data: {}}
+      this.Avgconv = {name: 'Convencional', data: {}}
+      this.convaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+      this.Avgexec = {name: 'Executivo', data: {}}
+      this.execaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+      this.Avgsl = {name: 'SemiLeito', data: {}}
+      this.slaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+      this.Avgl = {name: 'Leito', data: {}}
+      this.leitoaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
       this.loading = true
       for (let d = 0; d < 15; d++) {
         const promise = AppApi.buscrawl(this.origem, this.destino, this.datas[d]).then(response =>
@@ -116,17 +127,17 @@ export default {
         for (let b = 0; b < Object.keys(this.viagens[a]).length; b++) {
           const data_aux = (new Date(this.datas[a] + ' ' + this.viagens[a][b].horario)).toLocaleDateString()
           const hora_aux = (new Date(this.datas[a] + ' ' + this.viagens[a][b].horario)).toLocaleTimeString()
-          if (this.viagens[a][b].classe === 'Convencional') {
+          if (this.viagens[a][b].classe.match(this.r_conv)) {
             // adiciona no array de preço da respectiva classe
             this.Convgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             this.convaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
-          } else if (this.viagens[a][b].classe === 'Executivo') {
+          } else if (this.viagens[a][b].classe.match(this.r_exec)) {
             this.Execgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             this.execaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
-          } else if (this.viagens[a][b].classe === ('Semi-Leito' || 'SEMI LEITO')) {
+          } else if (this.viagens[a][b].classe.match(this.r_semi)) {
             this.Slgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             this.slaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
-          } else if (this.viagens[a][b].classe === 'Leito') {
+          } else if (this.viagens[a][b].classe.match(this.r_leito)) {
             this.Lgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             this.leitoaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
           }
