@@ -1,7 +1,6 @@
 <template>
   <section>
     <div>
-      <img src="monki.gif" v-if="loading">
       <v-layout justify-center align-center />
 
       <v-form>
@@ -46,6 +45,10 @@
             <div class="titles">Média de preços por classe</div>
             <line-chart :data="[Avgconv, Avgexec, Avgsl, Avgl]" />
           </section>
+          <v-progress-circular
+            indeterminate
+            color="primary" v-if="loading" style="margin-top: 10px"
+          />
         </v-container>
       </v-form>
     </div>
