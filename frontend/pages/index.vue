@@ -75,6 +75,7 @@ export default {
       Slgraph: {name: 'SemiLeito', data: {}},
       Lgraph: {name: 'Leito', data: {}},
       Avgconv: {name: 'Convencional', data: {}},
+      // em rotas menores alguns dias não tem viagem de uma classe específica, então na hora de fazer a média precisa começar tudo com 0
       convaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
       Avgexec: {name: 'Executivo', data: {}},
       execaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
@@ -82,6 +83,7 @@ export default {
       slaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
       Avgl: {name: 'Leito', data: {}},
       leitoaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
+      // regex função maravilhosa linda perfeita salvou minha vida
       r_conv: /Convencional/i,
       r_exec: /Executivo/i,
       r_semi: /Semi/i,
@@ -104,26 +106,27 @@ export default {
       this.reset_all()
       this.loading = true
       for (let d = 0; d < 15; d++) {
-        const promise = AppApi.buscrawl(this.origem, this.destino, this.datas[d]).then(response =>
-          response)
+        const promise = AppApi.buscrawl(this.origem, this.destino, this.datas[d]).then(response => response)
         const result = await promise
         this.viagens[d] = result
       }
       this.loading = false
       // for pra cada 1 dos 15 dias analisados
       for (let a = 0; a < 15; a++) {
-        // for pra cada viagem do dia
+        // for pra cada viagem do dia a
         for (let b = 0; b < Object.keys(this.viagens[a]).length; b++) {
+          // arrumando a desgraça do horário que vem com 3h a menos
           const data_aux = (new Date(this.datas[a] + ' ' + this.viagens[a][b].horario)).toLocaleDateString()
           const hora_aux = (new Date(this.datas[a] + ' ' + this.viagens[a][b].horario)).toLocaleTimeString()
           if (this.viagens[a][b].classe.match(this.r_conv)) {
-            // adiciona no array de preço da respectiva classe
+            // adiciona nos dados de preço da respectiva classe
             this.Convgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
+            // adiciona em uma matriz para fazer a média de preços desta classe nesse dia
             this.convaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
           } else if (this.viagens[a][b].classe.match(this.r_exec)) {
             this.Execgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             this.execaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
-            // ordem semi => leito proposital para semi-leito cair no semi e não no leito
+            // ordem obrigatória de if-else pois o leito só checa para "leito", então se viesse antes iria incluir tanto leito quanto semi-leito
           } else if (this.viagens[a][b].classe.match(this.r_semi)) {
             this.Slgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             this.slaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
@@ -132,7 +135,9 @@ export default {
             this.leitoaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
           }
         }
+        // contagem de viagens por dia
         this.dias.push([this.datas[a], Object.keys(this.viagens[a]).length])
+        // pega as médias de cada classe por dia e bota no objeto que o gráfico vai ler
         this.Avgconv.data[this.datas[a]] = this.average(this.convaux[a])
         this.Avgexec.data[this.datas[a]] = this.average(this.execaux[a])
         this.Avgsl.data[this.datas[a]] = this.average(this.slaux[a])
