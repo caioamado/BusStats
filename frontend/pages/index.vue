@@ -24,9 +24,16 @@
           <v-btn
             depressed
             elevation="2"
-            rounded @click="faz_tudo()"
+            rounded @click="get_viagens()"
           >
             Analisar rota
+          </v-btn>
+          <v-btn
+            depressed
+            elevation="2"
+            rounded @click="teste(viagens)"
+          >
+            Teste
           </v-btn>
           <section v-if="viagens[14]" style="width: 100%">
             <div class="titulozao">Rota  {{showorigem}}   =>   {{showdestino}}</div>
@@ -83,7 +90,7 @@ export default {
       slaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
       Avgl: {name: 'Leito', data: {}},
       leitoaux: [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]],
-      // regex função maravilhosa linda perfeita salvou minha vida
+      // regex função linda perfeita maravilhosa salvou minha vida
       r_conv: /Convencional/i,
       r_exec: /Executivo/i,
       r_semi: /Semi/i,
@@ -96,37 +103,27 @@ export default {
     }
   },
   methods: {
-    average: (array) => array.reduce((a, b) => a + b) / array.length,
     add_dias (days) {
       const result = new Date()
       result.setDate(result.getDate() + days)
       return result.toISOString().slice(0, 10)
     },
-    async faz_tudo () {
-      this.reset_all()
-      this.loading = true
-      for (let d = 0; d < 15; d++) {
-        const promise = AppApi.buscrawl(this.origem, this.destino, this.datas[d]).then(response => response)
-        const result = await promise
-        this.viagens[d] = result
-      }
-      this.loading = false
-      // for pra cada 1 dos 15 dias analisados
+    average: (array) => array.reduce((a, b) => a + b) / array.length,
+    builda_graficos () {
       for (let a = 0; a < 15; a++) {
-        // for pra cada viagem do dia a
         for (let b = 0; b < Object.keys(this.viagens[a]).length; b++) {
           // arrumando a desgraça do horário que vem com 3h a menos
           const data_aux = (new Date(this.datas[a] + ' ' + this.viagens[a][b].horario)).toLocaleDateString()
           const hora_aux = (new Date(this.datas[a] + ' ' + this.viagens[a][b].horario)).toLocaleTimeString()
           if (this.viagens[a][b].classe.match(this.r_conv)) {
-            // adiciona nos dados de preço da respectiva classe
+            // adiciona no gráfico de preço da respectiva classe
             this.Convgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             // adiciona em uma matriz para fazer a média de preços desta classe nesse dia
             this.convaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
           } else if (this.viagens[a][b].classe.match(this.r_exec)) {
             this.Execgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             this.execaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
-            // ordem obrigatória de if-else pois o leito só checa para "leito", então se viesse antes iria incluir tanto leito quanto semi-leito
+            // ordem obrigatória de if-else pois o regex r_leito só checa para "leito", então se viesse antes iria incluir tanto leito quanto semi-leito
           } else if (this.viagens[a][b].classe.match(this.r_semi)) {
             this.Slgraph.data[data_aux + ' ' + hora_aux] = parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.'))
             this.slaux[a].push(parseFloat(this.viagens[a][b].preco.slice(2).replace(',', '.')))
@@ -143,6 +140,19 @@ export default {
         this.Avgsl.data[this.datas[a]] = this.average(this.slaux[a])
         this.Avgl.data[this.datas[a]] = this.average(this.leitoaux[a])
       }
+    },
+    async get_viagens () {
+      this.loading = true
+      this.reset_all()
+      for (let d = 0; d < 15; d++) {
+        const promise = AppApi.buscrawl(this.origem, this.destino, this.datas[d]).then(response =>
+          response)
+        const result = await promise
+        this.viagens[d] = result
+        window.console.log(result)
+      }
+      this.builda_graficos()
+      this.loading = false
       this.showorigem = this.origem
       this.showdestino = this.destino
       this.origem = ''
@@ -164,6 +174,9 @@ export default {
       this.slaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
       this.Avgl = {name: 'Leito', data: {}}
       this.leitoaux = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+    },
+    teste (str) {
+      window.console.log(str)
     }
   }
 }
